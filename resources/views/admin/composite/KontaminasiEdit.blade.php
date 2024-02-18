@@ -8,7 +8,7 @@
             <div class="row mb-3 ">
                 <label for="KodeProduksi" class="col-sm-2 col-form-label col-form-label-sm">Kode Produksi :</label>
                 <div class="col-sm-5">
-                    <input type="text" name="KodeProduksi" value="<?php echo $data['KodeProduksi'];?>" class="Disabled input example form-control-sm">
+                    <input type="text" name="KodeProduksi" value="<?php echo $data['KodeProduksi'];?>" class="form-control form-control-sm" readonly>
                 </div>
             </div>
             <div class="row mb-3 ">

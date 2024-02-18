@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 
 
 use Carbon\Carbon;
+use Faker\Provider\ar_EG\Company;
 
 class CompositeController extends Controller
 
@@ -52,6 +53,7 @@ class CompositeController extends Controller
     public function orderproduksi(){
         $CompositeProduction = CompositeProduction::where('Status', '=', '0')
             ->leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
+            ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
             ->get();
         $BaglogComposite = CompositeBaglog::all()->groupBy('KodeComposite');
         return view('operator.composite.OrderProduksi', [
@@ -60,9 +62,9 @@ class CompositeController extends Controller
         ]);
     }
 
-    public function orderproduksiform($KodeProduksi){
+    public function orderproduksiform($id){
 
-        $JumlahComposite = CompositeProduction::where('KodeProduksi', $KodeProduksi)->value('JumlahComposite');
+        $JumlahComposite = CompositeProduction::where('id', $id)->value('JumlahComposite');
         $Data = Kartu_Kendali::orderBy('TanggalPembibitan', 'desc')
         ->select('KodeProduksi', 'SterilisasiID', 'JumlahBaglog')
         ->get();
@@ -95,18 +97,19 @@ class CompositeController extends Controller
         return view('operator.composite.FormProduksi', [
             'JumlahComposite' => $JumlahComposite,
             'Data' => $Data,
-            'KodeProduksi' => $KodeProduksi,
+            'id' => $id
+            // 'KodeProduksi' => $KodeProduksi,
         ]);
     }
 
-    public function orderproduksiformsubmit(Request $Request, $KodeProduksi){
+    public function orderproduksiformsubmit(Request $Request, $id){
         $Jumlah = 0;
         foreach($Request->data as $key => $value){
   
             $Jumlah = $Jumlah + $value['Jumlah'];
         }
         
-        CompositeProduction::where(['KodeProduksi'=>$KodeProduksi])
+        CompositeProduction::where(['id'=>$id])
         ->update([
             'Status'=>'1',
             'Keterangan'=>$Request['Keterangan'],
@@ -114,9 +117,12 @@ class CompositeController extends Controller
             'JumlahBaglog'=>$Jumlah,
         ]);
 
+        $kodeProduksi = CompositeProduction::where('id', $id)->value('KodeProduksi');
+
         foreach($Request->data as $key => $value){
             CompositeBaglogPemakaian::create([
-                'KodeComposite'=>$KodeProduksi,
+                'CompositeID'=>$id,
+                'KodeComposite'=>$kodeProduksi,
                 'KodeBaglog'=>$value['KodeBaglog'],
                 'Jumlah'=>$value['Jumlah'],
             ]);
@@ -127,8 +133,9 @@ class CompositeController extends Controller
 
     public function productionreport(){
         $CompositeProduction = CompositeProduction::where('Status', '=', '1')->where('StatusHarvest', '=', '0')
-        ->leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
-        ->get();
+                                ->leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
+                                ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
+                                ->get();
         $CompositeReminder = CompositeReminder::all()->groupBy('KodeProduksi');
         $CompositeKonta = CompositeKontaminasi::all()->groupBy('KodeProduksi');
         return view('operator.composite.ProductionReport', [
@@ -138,14 +145,16 @@ class CompositeController extends Controller
         ]);
     }
 
-    public function kontaminasi($KodeProduksi){
+    public function kontaminasi($id){
+        $kodeProduksi = CompositeProduction::where('id', $id)->value('KodeProduksi');
         return view('operator.composite.Kontaminasi', [
-            'KodeProduksi' => $KodeProduksi,
+            'KodeProduksi' => $kodeProduksi,
+            'id' => $id,
         ]);
     }
 
-    public function datakontaminasi($KodeProduksi){
-        $CompositeKonta = CompositeKontaminasi::where('KodeProduksi', '=', $KodeProduksi)->get();
+    public function datakontaminasi($id){
+        $CompositeKonta = CompositeKontaminasi::where('CompositeID', '=', $id)->get();
         return view('operator.composite.DataKonta', [
             'CompositeKonta' => $CompositeKonta,
         ]);
@@ -160,30 +169,41 @@ class CompositeController extends Controller
 
     public function submitkontaminasi(Request $request){
         CompositeKontaminasi::create([
+            'CompositeID'=>$request['CompositeID'],
             'KodeProduksi'=>$request['KodeProduksi'],
             'TanggalKonta'=>$request['TanggalKonta'],
             'Jumlah'=>$request['Jumlah'],
             'Keterangan'=>$request['Keterangan'],
         ]);
 
-        $CompositeProduction = CompositeProduction::all()->where('Status', '=', '1', 'StatusHarvest', '=', '0');
-        $CompositeReminder = CompositeReminder::all()->groupBy('KodeProduksi');
-        $CompositeKonta = CompositeKontaminasi::all()->groupBy('KodeProduksi');
-        return view('operator.composite.ProductionReport', [
-            'CompositeProduction' => $CompositeProduction,
-            'CompositeReminder' => $CompositeReminder,
-            'CompositeKonta' => $CompositeKonta,
+        return redirect()->route('OperatorCompositeReport');
+
+        // $CompositeProduction = CompositeProduction::where('Status', '=', '1')->where('StatusHarvest', '=', '0')
+        //                     ->leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
+        //                     ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
+        //                     ->get();
+        // $CompositeReminder = CompositeReminder::all()->groupBy('KodeProduksi');
+        // $CompositeKonta = CompositeKontaminasi::all()->groupBy('KodeProduksi');
+        // return view('operator.composite.ProductionReport', [
+        //     'CompositeProduction' => $CompositeProduction,
+        //     'CompositeReminder' => $CompositeReminder,
+        //     'CompositeKonta' => $CompositeKonta,
+        // ]);
+    }
+
+    public function harvest($id){
+        $kodeProduksi = CompositeProduction::where('id', $id)->value('KodeProduksi');
+        return view('operator.composite.Harvest', [
+            'KodeProduksi' => $kodeProduksi,
+            'id' => $id
         ]);
     }
 
-    public function harvest($KodeProduksi){
-        return view('operator.composite.Harvest', [
-            'KodeProduksi' => $KodeProduksi,
-        ]);
-    }
+
 
     public function submitharvest(Request $request){
         CompositeHarvest::create([
+            'CompositeID'=>$request['CompositeID'],
             'KodeProduksi'=>$request['KodeProduksi'],
             'JenisPanen'=>$request['JenisPanen'],
             'Passed'=>$request['Passed'],
@@ -191,7 +211,7 @@ class CompositeController extends Controller
             'Keterangan'=>$request['Keterangan'],
         ]);
 
-        CompositeProduction::where(['KodeProduksi'=>$request['KodeProduksi']])
+        CompositeProduction::where(['id'=>$request['CompositeID']])
         ->update(['StatusHarvest'=>'1',]);
 
         return redirect(url('operator/composite/production-report'));

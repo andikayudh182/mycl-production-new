@@ -67,9 +67,9 @@
                                 </div>
                             </div>
                         </td>
-                        <td><a href="{{ route('CompositeKontaminasi', ['KodeProduksi'=>$data['KodeProduksi'],]) }}">Kontaminasi</a></td>
-                        <td><a href="{{ route('CompositeDataKontaminasi', ['KodeProduksi'=>$data['KodeProduksi'],]) }}">Data Kontaminasi</a></td>
-                        <td><a href="{{ route('CompositeHarvest', ['KodeProduksi'=>$data['KodeProduksi'],]) }}">Harvest</a></td>
+                        <td><a href="{{ route('CompositeKontaminasi', ['id'=>$data['production_id'],]) }}">Kontaminasi</a></td>
+                        <td><a href="{{ route('CompositeDataKontaminasi', ['id'=>$data['production_id'],]) }}">Data Kontaminasi</a></td>
+                        <td><a href="{{ route('CompositeHarvest', ['id'=>$data['production_id'],]) }}">Harvest</a></td>
                     </tr> 
                 @endif
             @endforeach

@@ -93,14 +93,14 @@ Route::get('/admin/composite/report/data-baglog-delete/{id}', [App\Http\Controll
 Route::get('/admin/composite/report/data-baglog-delete-operator/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'DataBaglogDeleteOperator'])->middleware('role:admin');
 Route::get('/admin/composite/report/data-baglog-add/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'databaglogadd'])->middleware('role:admin');
 Route::post('/admin/composite/report/data-baglog-add-submit/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'databaglogaddsubmit'])->middleware('role:admin');
-Route::get('/admin/composite/report-edit/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'reportedit'])->middleware('role:admin');
-Route::get('/admin/composite/report/harvest-delete/{KodeProduksi}/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'deleteharvest'])->middleware('role:admin');
-Route::post('/admin/composite/report-submit/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'reportsubmit'])->middleware('role:admin');
-Route::get('/admin/composite/report/kontaminasi/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'kontaminasi'])->middleware('role:admin');
+Route::get('/admin/composite/report-edit/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'reportedit'])->middleware('role:admin');
+Route::get('/admin/composite/report/harvest-delete/{CompositeID}/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'deleteharvest'])->middleware('role:admin');
+Route::post('/admin/composite/report-submit/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'reportsubmit'])->middleware('role:admin');
+Route::get('/admin/composite/report/kontaminasi/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'kontaminasi'])->middleware('role:admin');
 Route::get('/admin/composite/report/kontaminasi-edit/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'kontaminasiedit'])->middleware('role:admin');
 Route::post('/admin/composite/report/kontaminasi-submit/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'kontaminasisubmit'])->middleware('role:admin');
 Route::get('/admin/composite/report/kontaminasi-delete/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'deletekontaminasi'])->middleware('role:admin');
-Route::get('/admin/composite/report/form-kontaminasi/{KodeProduksi}', [App\Http\Controllers\Admin\CompositeController::class, 'formkontaminasi'])->middleware('role:admin');
+Route::get('/admin/composite/report/form-kontaminasi/{id}', [App\Http\Controllers\Admin\CompositeController::class, 'formkontaminasi'])->middleware('role:admin');
 Route::post('/admin/composite/report/form-kontaminasi-submit', [App\Http\Controllers\Admin\CompositeController::class, 'formkontaminasisubmit'])->middleware('role:admin');
 
 //Post-Treatment
@@ -218,12 +218,12 @@ Route::post('/operator/biobo/monitoring-post-treatment-2/form-cutting-submit/{id
 //Composite Operator
 Route::get('/operator/composite', [App\Http\Controllers\Operator\CompositeController::class, 'index'])->middleware('auth');
 Route::get('/operator/composite/produksi-composite', [App\Http\Controllers\Operator\CompositeController::class, 'orderproduksi'])->middleware('auth');
-Route::get('/operator/composite/produksi-composite/{KodeProduksi}', [App\Http\Controllers\Operator\CompositeController::class, 'orderproduksiform'])->middleware('auth')->name('UpdateOrderProduksiComposite');
-Route::post('/operator/composite/produksi-composite/submit-form-produksi/{KodeProduksi}', [App\Http\Controllers\Operator\CompositeController::class, 'orderproduksiformsubmit'])->middleware('auth');
-Route::get('/operator/composite/production-report', [App\Http\Controllers\Operator\CompositeController::class, 'productionreport'])->middleware('auth');
-Route::get('/operator/composite/production-report/kontaminasi/{KodeProduksi}', [App\Http\Controllers\Operator\CompositeController::class, 'kontaminasi'])->middleware('auth')->name('CompositeKontaminasi');
-Route::get('/operator/composite/production-report/data-kontaminasi/{KodeProduksi}', [App\Http\Controllers\Operator\CompositeController::class, 'datakontaminasi'])->middleware('auth')->name('CompositeDataKontaminasi');
+Route::get('/operator/composite/produksi-composite/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'orderproduksiform'])->middleware('auth')->name('UpdateOrderProduksiComposite');
+Route::post('/operator/composite/produksi-composite/submit-form-produksi/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'orderproduksiformsubmit'])->middleware('auth');
+Route::get('/operator/composite/production-report', [App\Http\Controllers\Operator\CompositeController::class, 'productionreport'])->middleware('auth')->name('OperatorCompositeReport');
+Route::get('/operator/composite/production-report/kontaminasi/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'kontaminasi'])->middleware('auth')->name('CompositeKontaminasi');
+Route::get('/operator/composite/production-report/data-kontaminasi/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'datakontaminasi'])->middleware('auth')->name('CompositeDataKontaminasi');
 Route::post('/operator/composite/production-report/submit-kontaminasi', [App\Http\Controllers\Operator\CompositeController::class, 'submitkontaminasi'])->middleware('auth');
 Route::get('/operator/composite/report/kontaminasi-delete/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'deletekontaminasi']);
-Route::get('/operator/composite/production-report/harvest/{KodeProduksi}', [App\Http\Controllers\Operator\CompositeController::class, 'harvest'])->middleware('auth')->name('CompositeHarvest');
+Route::get('/operator/composite/production-report/harvest/{id}', [App\Http\Controllers\Operator\CompositeController::class, 'harvest'])->middleware('auth')->name('CompositeHarvest');
 Route::post('/operator/composite/production-report/submit-harvest', [App\Http\Controllers\Operator\CompositeController::class, 'submitharvest'])->middleware('auth');

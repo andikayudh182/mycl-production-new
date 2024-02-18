@@ -24,6 +24,7 @@
             @foreach ($CompositeProduction as $data)
                 <tr>
                     <td>{{$data['KodeProduksi']}}</td>
+                    <td>{{$data['KodeProduksi']}}</td>
                     <td>{{$data['TanggalProduksi']}}</td>
                     <td>{{$data['JumlahBaglog']}}</td>
                     <td>{{$data['Nama']}}</td>
@@ -39,14 +40,15 @@
                             </div>
                             <div class="offcanvas-body">
                                 @if(isset($Baglog[$data['KodeProduksi']]))
-                                @foreach ($Baglog[$data['KodeProduksi']] as $baglog )
-                                    <?php echo $baglog['KodeBaglog'];?> : <?php echo $baglog['Jumlah'];?> </br>
-                                @endforeach   
+                                    @foreach ($Baglog[$data['KodeProduksi']] as $baglog )
+                                        <?php echo $baglog['KodeBaglog'];?> : <?php echo $baglog['Jumlah'];?> </br>
+                                        
+                                    @endforeach   
                                 @endif 
                             </div>
                         </div>
                     </td>
-                    <td><a href="{{ route('UpdateOrderProduksiComposite', ['KodeProduksi'=>$data['KodeProduksi'],]) }}">Kerjakan</a></td>
+                    <td><a href="{{ route('UpdateOrderProduksiComposite', ['id'=>$data['production_id'],]) }}">Kerjakan</a></td>
                 </tr>
             @endforeach
         </table>

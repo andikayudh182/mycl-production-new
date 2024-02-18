@@ -21,6 +21,7 @@
                 <th>Tanggal Kontaminasi</th>
                 <th>Jumlah</th>
                 <th>Keterangan</th>
+                <th colspan="2" class="text-center">Aksi</th>
             </tr>
             @foreach ($CompositeKonta as $data)
             <tr>

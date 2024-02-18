@@ -15,7 +15,7 @@
 {{-- {{ $JumlahComposite }} --}}
 <section class="m-5">
     <h2>Produksi Composite</h2>
-    <form action="{{url('/operator/composite/produksi-composite/submit-form-produksi', ['KodeProduksi' => $KodeProduksi,])}}" method="POST">
+    <form action="{{url('/operator/composite/produksi-composite/submit-form-produksi', ['id' => $id,])}}" method="POST">
         @csrf
         <div class="row mb-3 ">
             <label for="JumlahComposite" class="col-sm-2 col-form-label col-form-label-sm">JumlahComposite :</label>

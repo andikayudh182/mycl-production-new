@@ -40,11 +40,12 @@
     <div class="d-flex justify-content-center m-3">
         <h3>Input Produksi Composite {{$KodeProduksi}}</h3>
     </div>
-    <form method="POST" action="{{url('/admin/composite/report-submit', ['KodeProduksi'=>$KodeProduksi,])}}">
+    <form method="POST" action="{{url('/admin/composite/report-submit', ['id'=>$id,])}}">
         @csrf
         <div class="row mb-3 ">
             <label for="TanggalProduksi" class="col-sm-2 col-form-label col-form-label-sm">Tanggal Produksi :</label>
             <div class="col-sm-5">
+                <input type="hidden" name="KodeProduksi" value="{{ $KodeProduksi }}">
                 <input type="date" name="TanggalProduksi" class="form-control form-control-sm" id="colFormLabelSm" value="<?php echo $CompositeProduction[0]['TanggalProduksi']?>">
             </div>
         </div>

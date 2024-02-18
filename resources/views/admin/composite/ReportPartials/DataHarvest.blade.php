@@ -1,4 +1,4 @@
-<div class="modal fade" id="DataHarvest{{$data['id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="DataHarvest{{$data['production_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
@@ -13,13 +13,13 @@
                     <th>Passed</th>
                     <th>Reject</th>
                 </tr>
-                @foreach ($data['Harvest'] as $data)
+                @foreach ($data['Harvest'] as $dataHarvest)
                 <tr>
-                    <td><?php echo $data['KodeProduksi']?></td>
-                    <td><?php echo $data['JenisPanen']?></td>
-                    <td><?php echo $data['Passed']?></td>
-                    <td><?php echo $data['Reject']?></td>
-                    <td><a href="{{url('/admin/composite/report/harvest-delete', ['id'=>$data['id'], 'KodeProduksi'=>$data['KodeProduksi'],])}}">Delete</a></td>
+                    <td><?php echo $dataHarvest['KodeProduksi']?></td>
+                    <td><?php echo $dataHarvest['JenisPanen']?></td>
+                    <td><?php echo $dataHarvest['Passed']?></td>
+                    <td><?php echo $dataHarvest['Reject']?></td>
+                    <td><a href="{{url('/admin/composite/report/harvest-delete', ['id'=>$dataHarvest['id'], 'CompositeID'=>$data['production_id'],])}}">Delete</a></td>
                 </tr>  
                 @endforeach
             </table>

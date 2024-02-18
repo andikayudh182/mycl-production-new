@@ -131,27 +131,32 @@
                             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </div>
                         <div class="offcanvas-body">
-                            Buka Cetakan : {{$data['Reminder'][0]['TanggalBukaCetakan']}} <br>
-                            Inkubasi : {{$data['Reminder'][0]['TanggalInkubasi']}} <br>
-                            Panen : {{$data['Reminder'][0]['TanggalPanen']}} <br><br>
+                            @if(isset($data['Reminder'][0]))
+                                Buka Cetakan : {{$data['Reminder'][0]['TanggalBukaCetakan']}} <br>
+                                Inkubasi : {{$data['Reminder'][0]['TanggalInkubasi']}} <br>
+                                Panen : {{$data['Reminder'][0]['TanggalPanen']}} <br><br>
+                            @else
+                                Data Reminder tidak tersedia.
+                            @endif
+                            
                         </div>
                         </div>
                     </td>
                     <td>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DataBaglog{{$data['id']}}" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DataBaglog{{$data['production_id']}}" data-bs-dismiss="modal">
                             Data Baglog
                         </button>
                         @include('admin.composite.ReportPartials.DataBaglog')
                     </td>
                     <td>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DataHarvest{{$data['id']}}" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DataHarvest{{$data['production_id']}}" data-bs-dismiss="modal">
                             Data Harvest
                         </button>
                         @include('admin.composite.ReportPartials.DataHarvest')
                     </td>
-                    <td><a href="{{url('/admin/composite/report-edit', ['KodeProduksi'=>$data['KodeProduksi'],])}}">Edit</a></td>
-                    <td><a href="{{url('/admin/composite/report/kontaminasi', ['KodeProduksi'=>$data['KodeProduksi'],])}}">Data Kontaminasi</a></td>
-                    <td><a href="{{url('/admin/composite/report/form-kontaminasi', ['KodeProduksi'=>$data['KodeProduksi'],])}}">Form Kontaminasi</a></td>
+                    <td><a href="{{url('/admin/composite/report-edit', ['id'=>$data['production_id'],])}}">Edit</a></td>
+                    <td><a href="{{url('/admin/composite/report/kontaminasi', ['id'=>$data['production_id'],])}}">Data Kontaminasi</a></td>
+                    <td><a href="{{url('/admin/composite/report/form-kontaminasi', ['id'=>$data['production_id'],])}}">Form Kontaminasi</a></td>
                 </tr>
             @endforeach
         </table>

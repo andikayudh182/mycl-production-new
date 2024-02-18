@@ -209,12 +209,12 @@ class CompositeController extends Controller
 
     public function report(Request $request){
         $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
-            ->select('composite_production.*', 'composite_variant.Nama')
+            ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
             ->sortable()
             ->orderBy('composite_production.TanggalProduksi', 'asc')
             ->paginate(15);
         $CompositeProductionAll = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
-            ->select('composite_production.*', 'composite_variant.Nama')
+            ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
             ->orderBy('composite_production.TanggalProduksi', 'asc')
             ->get();
         $InStock = $CompositeProductionAll->sum('JumlahBaglog');;
@@ -223,33 +223,33 @@ class CompositeController extends Controller
         if(isset($request->Submit)){
             $search = $request->SearchQuery;
             $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
-            ->select('composite_production.*', 'composite_variant.Nama')
-            ->where('KodeProduksi', 'like', "%" . $search . "%")
-            ->orderBy('composite_production.TanggalProduksi', 'asc')
-            ->paginate(150);
+                                    ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
+                                    ->where('KodeProduksi', 'like', "%" . $search . "%")
+                                    ->orderBy('composite_production.TanggalProduksi', 'asc')
+                                    ->paginate(150);
             $InStock = $CompositeProduction->sum('JumlahBaglog');
         }
         if(isset($request->Filter)){
             $Date1 = date('Y-m-d', strtotime($request['TanggalAwal']));
             $Date2 = date('Y-m-d', strtotime($request['TanggalAkhir']));
             $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
-            ->select('composite_production.*', 'composite_variant.Nama')
-            ->whereBetween('composite_production.TanggalProduksi', [$Date1, $Date2])
-            ->orderBy('composite_production.TanggalProduksi', 'asc')
-            ->paginate(150);
+                                    ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
+                                    ->whereBetween('composite_production.TanggalProduksi', [$Date1, $Date2])
+                                    ->orderBy('composite_production.TanggalProduksi', 'asc')
+                                    ->paginate(150);
             $InStock = $CompositeProduction->sum('JumlahBaglog');
             $resume['TanggalAwal'] = $Date1;
             $resume['TanggalAkhir'] = $Date2;
         }
 
         foreach($CompositeProduction as $data){
-            $data['Reminder'] = CompositeReminder::where('KodeProduksi', $data['KodeProduksi'])->get();
-            $data['Baglog'] = CompositeBaglog::where('KodeComposite', $data['KodeProduksi'])->get();
-            $data['CompositeOperator'] = CompositeBaglogPemakaian::where('KodeComposite', $data['KodeProduksi'])->get();
-            $data['Kontaminasi'] = CompositeKontaminasi::where('KodeProduksi', $data['KodeProduksi'])->get();
+            $data['Reminder'] = CompositeReminder::where('CompositeID', $data['production_id'])->get();
+            $data['Baglog'] = CompositeBaglog::where('CompositeID', $data['production_id'])->get();
+            $data['CompositeOperator'] = CompositeBaglogPemakaian::where('CompositeID', $data['production_id'])->get();
+            $data['Kontaminasi'] = CompositeKontaminasi::where('CompositeID', $data['production_id'])->get();
             $data['JumlahKontaminasi'] = $data['Kontaminasi']->sum('Jumlah');
 
-            $data['Harvest'] = CompositeHarvest::where('KodeProduksi', $data['KodeProduksi'])->get();
+            $data['Harvest'] = CompositeHarvest::where('CompositeID', $data['production_id'])->get();
             // $data['HarvestBiobo'];
             $data['Passed'] = $data['Harvest']->sum('Passed');
             $data['Reject'] = $data['Harvest']->sum('Reject');
@@ -268,8 +268,8 @@ class CompositeController extends Controller
             $CompositeProductionAll = $CompositeProduction;
         }
         foreach($CompositeProductionAll as $item){
-            $item['Kontaminasi'] = CompositeKontaminasi::where('KodeProduksi', $item['KodeProduksi'])->get();
-            $item['Harvest'] = CompositeHarvest::where('KodeProduksi', $item['KodeProduksi'])->get();
+            $item['Kontaminasi'] = CompositeKontaminasi::where('CompositeID', $item['production_id'])->get();
+            $item['Harvest'] = CompositeHarvest::where('CompositeID', $item['production_id'])->get();
             $TotalKontaminasi = $item['Kontaminasi']->sum('Jumlah');
             $Reject = $item['Harvest']->sum('Reject');
             $Passed = $item['Harvest']->sum('Passed');
@@ -406,23 +406,29 @@ class CompositeController extends Controller
 
         return redirect(url('/admin/composite/report'))->with('message', 'Data Baglog Added');
     }
-    public function deleteharvest($id, $KodeProduksi){
+    public function deleteharvest($id, $CompositeID){
         CompositeHarvest::where('id', $id)->delete();
 
-        CompositeProduction::where(['KodeProduksi'=>$KodeProduksi])
+        CompositeProduction::where(['id'=>$CompositeID])
         ->update(['StatusHarvest'=>'0',]);
 
+        $KodeProduksi = CompositeProduction::where('id', $CompositeID)->value('KodeProduksi');
+
         // $MyleaHarvest = MyleaHarvest::where('KodeProduksi', '=', $KodeProduksi)->get();
-        return redirect(url('/admin/composite/report'))->with('message', 'Data Harvest'.$KodeProduksi.' Deleted!');
+        return redirect()->back()->with('success', 'Data Harvest'.$KodeProduksi.' Deleted!');
     }
 
-    public function reportedit($KodeProduksi){
-        $CompositeProduction = CompositeProduction::where('KodeProduksi', '=', $KodeProduksi)
+    public function reportedit($id){
+
+        $kodeProduksi = CompositeProduction::where('id', '=', $id)->value('KodeProduksi');
+
+        $CompositeProduction = CompositeProduction::where('composite_production.id', '=', $id)
         ->leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
+        ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
         ->get();
 
-        $CompositeBaglogAdmin = CompositeBaglog::where('KodeComposite', '=', $KodeProduksi)->get();
-        $CompositeBaglogOperator = CompositeBaglogPemakaian::where('KodeComposite', '=', $KodeProduksi)->get();
+        $CompositeBaglogAdmin = CompositeBaglog::where('CompositeID', '=', $id)->get();
+        $CompositeBaglogOperator = CompositeBaglogPemakaian::where('CompositeID', '=', $id)->get();
 
 
         //Data variant composite
@@ -464,7 +470,8 @@ class CompositeController extends Controller
         }
 
         return view('admin.composite.ReportEdit', [
-            'KodeProduksi' => $KodeProduksi,
+            'KodeProduksi' => $kodeProduksi,
+            'id' => $id,
             'CompositeProduction'=>$CompositeProduction,
             'VariantComposite'=>$VariantComposite,
 
@@ -475,27 +482,27 @@ class CompositeController extends Controller
         ]);
     }
 
-    public function reportsubmit(Request $request){
+    public function reportsubmit($id, Request $request){
 
         try {
             $OldProductionCode = $request['KodeProduksi'];
             $NewProductionCode = substr($OldProductionCode, 0, 4). substr($request['TanggalProduksi'], 4, 9);
-            CompositeBaglog::where('KodeComposite', $OldProductionCode)->update([
+            CompositeBaglog::where('CompositeID', $id)->update([
                 'KodeComposite'=>$NewProductionCode,
             ]);
-            CompositeBaglogPemakaian::where('KodeComposite', $OldProductionCode)->update([
+            CompositeBaglogPemakaian::where('CompositeID', $id)->update([
                 'KodeComposite'=>$NewProductionCode,
             ]);
-            CompositeKontaminasi::where('KodeProduksi', $OldProductionCode)->update([
+            CompositeKontaminasi::where('CompositeID', $id)->update([
                 'KodeProduksi'=>$NewProductionCode,
             ]);
-            CompositeHarvest::where('KodeProduksi', $OldProductionCode)->update([
+            CompositeHarvest::where('CompositeID', $id)->update([
                 'KodeProduksi'=>$NewProductionCode,
             ]);
-            CompositeReminder::where('KodeProduksi', $OldProductionCode)->update([
+            CompositeReminder::where('CompositeID', $id)->update([
                 'KodeProduksi'=>$NewProductionCode,
             ]);
-            CompositeProduction::where(['KodeProduksi'=>$request['KodeProduksi']])
+            CompositeProduction::where(['id'=>$id])
             ->update([
                 'KodeProduksi'=>$NewProductionCode,
                 'TanggalProduksi'=>$request['TanggalProduksi'],
@@ -506,14 +513,15 @@ class CompositeController extends Controller
                 'Lokasi'=>$request['Lokasi'],
             ]);
 
-            CompositeBaglog::where(['KodeComposite'=>$NewProductionCode])
+            CompositeBaglog::where(['CompositeID'=>$id])
             ->delete();
 
-            CompositeBaglogPemakaian::where(['KodeComposite'=>$NewProductionCode])
+            CompositeBaglogPemakaian::where(['CompositeID'=>$id])
             ->delete();
 
             foreach($request['data1'] as $value){
                 CompositeBaglog::create([
+                    'CompositeID'=>$id,
                     'KodeComposite'=>$NewProductionCode,
                     'KodeBaglog'=>$value['KodeBaglog'],
                     'Jumlah'=>$value['Jumlah'],
@@ -524,6 +532,7 @@ class CompositeController extends Controller
 
             foreach($request['data2'] as $value){
                 CompositeBaglogPemakaian::create([
+                    'CompositeID'=>$id,
                     'KodeComposite'=>$NewProductionCode,
                     'KodeBaglog'=>$value['KodeBaglog'],
                     'Jumlah'=>$value['Jumlah'],
@@ -531,7 +540,7 @@ class CompositeController extends Controller
                 $JumlahBaglogTerpakai = $JumlahBaglogTerpakai + $value['Jumlah'];
             }
 
-            CompositeProduction::where(['KodeProduksi'=>$NewProductionCode])
+            CompositeProduction::where(['id'=>$id])
             ->update([
                
                 'JumlahBaglog'=>$JumlahBaglogTerpakai,
@@ -546,8 +555,8 @@ class CompositeController extends Controller
     
     }
 
-    public function kontaminasi($KodeProduksi){
-        $CompositeKonta = CompositeKontaminasi::where('KodeProduksi', '=', $KodeProduksi)->get();
+    public function kontaminasi($id){
+        $CompositeKonta = CompositeKontaminasi::where('CompositeID', '=', $id)->get();
         return view('admin.composite.Kontaminasi', [
             'CompositeKonta'=>$CompositeKonta,
         ]);
@@ -582,30 +591,38 @@ class CompositeController extends Controller
     }
 
     public function deletekontaminasi($id){
+
+        
+        $KodeProduksi= CompositeKontaminasi::where('id',$id)->value('KodeProduksi');
         CompositeKontaminasi::where(['id'=>$id])
         ->delete();
 
-        $CompositeProduction = CompositeProduction::orderBy('TanggalProduksi', 'asc')->paginate(15);
-        $CompositeReminder = CompositeReminder::all()->groupBy('KodeProduksi');
-        $CompositeKonta = CompositeKontaminasi::all()->groupBy('KodeProduksi');
-        $CompositeHarvest = CompositeHarvest::all()->groupBy('KodeProduksi');
-        return view('admin.composite.Report', [
-            'CompositeProduction' => $CompositeProduction,
-            'CompositeReminder' => $CompositeReminder,
-            'CompositeKonta' => $CompositeKonta,
-            'CompositeHarvest' => $CompositeHarvest,
-        ]);
+
+        // $CompositeProduction = CompositeProduction::orderBy('TanggalProduksi', 'asc')->paginate(15);
+        // $CompositeReminder = CompositeReminder::all()->groupBy('KodeProduksi');
+        // $CompositeKonta = CompositeKontaminasi::all()->groupBy('KodeProduksi');
+        // $CompositeHarvest = CompositeHarvest::all()->groupBy('KodeProduksi');
+        // return view('admin.composite.Report', [
+        //     'CompositeProduction' => $CompositeProduction,
+        //     'CompositeReminder' => $CompositeReminder,
+        //     'CompositeKonta' => $CompositeKonta,
+        //     'CompositeHarvest' => $CompositeHarvest,
+        // ]);
+        return redirect()->back()->with('success', 'Data Kontaminasi'.$KodeProduksi.' Deleted!');
     }
 
-    public function formkontaminasi($KodeProduksi){
+    public function formkontaminasi($id){
+        $KodeProduksi = CompositeProduction::where('id', $id)->value('KodeProduksi');
         return view('admin.composite.FormKontaminasi', [
             'KodeProduksi'=>$KodeProduksi,
+            'id'=>$id
         ]);
     }
 
     public function formkontaminasisubmit(Request $request){
         CompositeKontaminasi::create([
             'KodeProduksi'=>$request['KodeProduksi'],
+            'CompositeID'=>$request['CompositeID'],
             'TanggalKonta'=>$request['TanggalKonta'],
             'Jumlah'=>$request['Jumlah'],
             'Keterangan'=>$request['Keterangan'],
