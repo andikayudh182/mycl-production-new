@@ -53,12 +53,13 @@ class AdminDashboard extends Controller
         $PT2 = PT2::all()->where('TanggalCutting', '=', null);
 
         $CompositeProductionAll = CompositeProduction::leftJoin('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
+        ->select('composite_production.*', 'composite_variant.*', 'composite_production.id as production_id')
         ->orderBy('composite_production.TanggalProduksi', 'asc')
         ->get();
 
         foreach($CompositeProductionAll as $data) {
-            $data['Reminder'] = CompositeReminder::where('KodeProduksi', $data['KodeProduksi'])->get();
-            $data['Kontaminasi'] = CompositeKontaminasi::where('KodeProduksi', $data['KodeProduksi'])->get();
+            $data['Reminder'] = CompositeReminder::where('CompositeID', $data['production_id'])->get();
+            $data['Kontaminasi'] = CompositeKontaminasi::where('CompositeID', $data['production_id'])->get();
             $data['JumlahKontaminasi'] = $data['Kontaminasi']->sum('Jumlah');
         }
 

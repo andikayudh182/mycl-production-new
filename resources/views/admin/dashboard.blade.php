@@ -248,16 +248,21 @@
                                             <th>Jumlah Composite</th>
                                             <th>In Stock</th>
                                         </tr>
-                                        @foreach ( $Composite as $data )
-                                        <tr>
-                                            @if ($data['Reminder'][0]['TanggalBukaCetakan'] === date('Y-m-d'))
-                                            <td>{{ $data['KodeProduksi'] }}</td>
-                                            <td>{{ $data['Nama'] }}</td>
-                                            <td>{{ $data['JumlahComposite'] }}</td>
-                                            <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
-                                            @endif
-                                        </tr>                                            
-                                        @endforeach
+                                        @if (isset($Composite))
+
+                                            @foreach ( $Composite as $data )
+                                            <tr>
+                                                @if ($data['Reminder'][0]['TanggalBukaCetakan'] === date('Y-m-d'))
+                                                <td>{{ $data['KodeProduksi'] }}</td>
+                                                <td>{{ $data['Nama'] }}</td>
+                                                <td>{{ $data['JumlahComposite'] }}</td>
+                                                <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
+                                                @endif
+                                            </tr>                                            
+                                            @endforeach  
+
+                                        @endif
+                            
 
                                     </table>
                             </div>
@@ -271,17 +276,18 @@
                                             <th>Jumlah Composite</th>
                                             <th>In Stock</th>
                                         </tr>
-                                        @foreach ( $Composite as $data )
-                                        <tr>
-                                            @if ($data['Reminder'][0]['TanggalInkubasi'] === date('2023-10-10'))
-                                            <td>{{ $data['KodeProduksi'] }}</td>
-                                            <td>{{ $data['Nama'] }}</td>
-                                            <td>{{ $data['JumlahComposite'] }}</td>
-                                            <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
-                                            @endif
-                                        </tr>                                            
-                                        @endforeach
-
+                                        @if (isset($Composite))
+                                            @foreach ( $Composite as $data )
+                                            <tr>
+                                                @if ($data['Reminder'][0]['TanggalInkubasi'] === date('2023-10-10'))
+                                                <td>{{ $data['KodeProduksi'] }}</td>
+                                                <td>{{ $data['Nama'] }}</td>
+                                                <td>{{ $data['JumlahComposite'] }}</td>
+                                                <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
+                                                @endif
+                                            </tr>                                            
+                                            @endforeach    
+                                        @endif
                                     </table>
                             </div>
                             <div class="m-2">
@@ -293,17 +299,20 @@
                                             <th>Jumlah Composite</th>
                                             <th>In Stock</th>
                                         </tr>
-                                        @foreach ( $Composite as $data )
-                                        <tr>
-                                            @if ( $data['Reminder'][0]['TanggalPanen'] === date('Y-m-d') )
-                                                <td>{{ $data['KodeProduksi'] }}</td>
-                                                <td>{{ $data['Nama'] }}</td>
-                                                <td>{{ $data['JumlahComposite'] }}</td>
-                                                <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
-                                            @endif
-                                          
-                                        </tr>                                            
-                                        @endforeach
+                                        @if (isset($Composite))
+                                            @foreach ( $Composite as $data )
+                                            <tr>
+                                                @if ( $data['Reminder'][0]['TanggalPanen'] === date('Y-m-d') )
+                                                    <td>{{ $data['KodeProduksi'] }}</td>
+                                                    <td>{{ $data['Nama'] }}</td>
+                                                    <td>{{ $data['JumlahComposite'] }}</td>
+                                                    <td>{{ $data['JumlahComposite'] - $data['JumlahKontaminasi']}}</td>
+                                                @endif
+                                            
+                                            </tr>                                            
+                                            @endforeach      
+                                        @endif
+       
 
                                     </table>
                             </div>
