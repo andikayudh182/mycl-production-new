@@ -123,8 +123,8 @@ class MyleaController extends Controller
     }
 
     public function report(Request $request){
-        $MyleaProduction = MyleaProduction::sortable()->orderBy('TanggalProduksi', 'asc')->paginate(15);
-        $MyleaProductionAll = MyleaProduction::orderBy('TanggalProduksi', 'asc')->get();
+        $MyleaProduction = MyleaProduction::sortable()->orderBy('TanggalProduksi', 'desc')->paginate(15);
+        $MyleaProductionAll = MyleaProduction::orderBy('TanggalProduksi', 'desc')->get();
         $InStock = $MyleaProductionAll->sum('JumlahBaglog');;
 
         //filter and search

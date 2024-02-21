@@ -211,11 +211,11 @@ class CompositeController extends Controller
         $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
             ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
             ->sortable()
-            ->orderBy('composite_production.TanggalProduksi', 'asc')
+            ->orderBy('composite_production.TanggalProduksi', 'desc')
             ->paginate(15);
         $CompositeProductionAll = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
             ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
-            ->orderBy('composite_production.TanggalProduksi', 'asc')
+            ->orderBy('composite_production.TanggalProduksi', 'desc')
             ->get();
         $InStock = $CompositeProductionAll->sum('JumlahBaglog');;
 
@@ -225,7 +225,7 @@ class CompositeController extends Controller
             $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
                                     ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
                                     ->where('KodeProduksi', 'like', "%" . $search . "%")
-                                    ->orderBy('composite_production.TanggalProduksi', 'asc')
+                                    ->orderBy('composite_production.TanggalProduksi', 'desc')
                                     ->paginate(150);
             $InStock = $CompositeProduction->sum('JumlahBaglog');
         }
@@ -235,7 +235,7 @@ class CompositeController extends Controller
             $CompositeProduction = CompositeProduction::join('composite_variant', 'composite_production.JenisComposite', '=', 'composite_variant.id')
                                     ->select('composite_production.id as production_id', 'composite_variant.id as variant_id', 'composite_production.*', 'composite_variant.*')
                                     ->whereBetween('composite_production.TanggalProduksi', [$Date1, $Date2])
-                                    ->orderBy('composite_production.TanggalProduksi', 'asc')
+                                    ->orderBy('composite_production.TanggalProduksi', 'desc')
                                     ->paginate(150);
             $InStock = $CompositeProduction->sum('JumlahBaglog');
             $resume['TanggalAwal'] = $Date1;
