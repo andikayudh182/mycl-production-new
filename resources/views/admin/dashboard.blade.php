@@ -252,7 +252,7 @@
 
                                             @foreach ( $Composite as $data )
                                             <tr>
-                                                @if ($data['Reminder'][0]['TanggalBukaCetakan'] === date('Y-m-d'))
+                                                @if (isset($data['Reminder'][0]['TanggalBukaCetakan']) && $data['Reminder'][0]['TanggalBukaCetakan'] === date('Y-m-d'))
                                                 <td>{{ $data['KodeProduksi'] }}</td>
                                                 <td>{{ $data['Nama'] }}</td>
                                                 <td>{{ $data['JumlahComposite'] }}</td>
@@ -279,7 +279,7 @@
                                         @if (isset($Composite))
                                             @foreach ( $Composite as $data )
                                             <tr>
-                                                @if ($data['Reminder'][0]['TanggalInkubasi'] === date('2023-10-10'))
+                                                @if (isset($data['Reminder'][0]['TanggalInkubasi']) && $data['Reminder'][0]['TanggalInkubasi'] === date('Y-m-d'))
                                                 <td>{{ $data['KodeProduksi'] }}</td>
                                                 <td>{{ $data['Nama'] }}</td>
                                                 <td>{{ $data['JumlahComposite'] }}</td>
@@ -302,7 +302,7 @@
                                         @if (isset($Composite))
                                             @foreach ( $Composite as $data )
                                             <tr>
-                                                @if ( $data['Reminder'][0]['TanggalPanen'] === date('Y-m-d') )
+                                                @if (isset($data['Reminder'][0]['TanggalPanen']) && $data['Reminder'][0]['TanggalPanen'] === date('Y-m-d'))
                                                     <td>{{ $data['KodeProduksi'] }}</td>
                                                     <td>{{ $data['Nama'] }}</td>
                                                     <td>{{ $data['JumlahComposite'] }}</td>
