@@ -98,6 +98,8 @@
                 <input type="text" name="Lokasi" class="form-control form-control-sm" id="colFormLabelSm" value="<?php echo $CompositeProduction[0]['Lokasi'];?>">
             </div>
         </div>
+
+    
         <div class="row mb-3">
             <div class="col-sm-7">
                 <table class="table table-bordered" id="dynamicAddRemove">
@@ -106,6 +108,33 @@
                         <th>Jumlah</th>
                         <th>Action</th>
                     </tr>
+                    @if ($BaglogAdmin->isEmpty())
+                    <tr>
+                        <td>
+                            <select name="data1[0][KodeBaglog]" class="form-select">
+                                @foreach ($Data as $data)
+                                    @if ($data['InStock'] > 0)
+                                        @foreach ($data['Sterilisasi'] as $sterilisasi)
+                                            @if ($sterilisasi->JenisBibit === 'GN')
+                                                <option value="{{ $data['KodeProduksi'] }}">
+                                                    {{ $data['KodeProduksi'] . ' : ' . $data['InStock'] }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    @endif 
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="data1[0][Jumlah]" class="form-control" />
+                        </td>
+                        <td>
+                             <button type="button" name="add" id="dynamic-ar" class="btn btn-outline-primary">Tambah Baglog</button>
+                        </td>
+                    </tr>
+
+                    @else
+
                     @foreach ($BaglogAdmin as $index => $dataBaglog1)
                         <tr>
                             <td>
@@ -144,6 +173,7 @@
                             </td>
                         </tr>
                     @endforeach
+                    @endif
                 </table>
             </div>
         </div>
@@ -155,6 +185,32 @@
                         <th>Jumlah</th>
                         <th>Action</th>
                     </tr>
+                    @if ($BaglogOperator->isEmpty())
+                    <tr>
+                        <td>
+                            <select name="data2[0][KodeBaglog]" class="form-select">
+                                @foreach ($Data as $data)
+                                    @if ($data['InStock'] > 0)
+                                        @foreach ($data['Sterilisasi'] as $sterilisasi)
+                                            @if ($sterilisasi->JenisBibit === 'GN')
+                                                <option value="{{ $data['KodeProduksi'] }}">
+                                                    {{ $data['KodeProduksi'] . ' : ' . $data['InStock'] }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    @endif 
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="data2[0][Jumlah]" class="form-control" />
+                        </td>
+                        <td>
+                             <button type="button" name="add" id="dynamic-ar2" class="btn btn-outline-primary">Tambah Baglog</button>
+                        </td>
+                    </tr>
+                    @else
+
                     @foreach ($BaglogOperator as $index => $dataBaglog2)
                         <tr>
                             <td>
@@ -193,6 +249,7 @@
                             </td>
                         </tr>
                     @endforeach
+                    @endif
                 </table>
             </div>
         </div>
@@ -212,29 +269,31 @@
       <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
       <script type="text/javascript">
-          var i = 0;
-          $("#dynamic-ar").click(function () {
-              ++i;
-              var newOption = '';
-              @foreach ($Data as $data)
-                  @if ($data['InStock'] > 0)
-                      @foreach ($data['Sterilisasi'] as $sterilisasi)
-                          @if ($sterilisasi->JenisBibit === 'GN')
-                              newOption += '<option value="{{ $data['KodeProduksi'] }}">{{ $data['KodeProduksi'] . ' : ' . $data['InStock'] }}</option>';
-                              @break
-                          @endif
-                      @endforeach
-                  @endif 
-              @endforeach
-              var newRow = '<tr><td><select name="data1[' + i + '][KodeBaglog]" class="form-select" id="KodeBaglog">' + newOption + '</select></td><td><input type="number" name="data1' + i + '][Jumlah]" class="form-control" /></td><td><button type="button" class="btn btn-outline-danger remove-input-field">Delete</button></td></tr>';
-              $("#dynamicAddRemove").append(newRow);
-          });
-          $(document).on('click', '.remove-input-field', function () {
-              $(this).parents('tr').remove();
-          });
+        $(document).ready(function(){
+            var i = {{ $BaglogAdmin->isEmpty() ? 0 : count($BaglogAdmin) }};
+            $("#dynamic-ar").click(function(){
+                var newOption = '';
+                @foreach ($Data as $data)
+                    @if ($data['InStock'] > 0)
+                        @foreach ($data['Sterilisasi'] as $sterilisasi)
+                            @if ($sterilisasi->JenisBibit === 'GN')
+                                newOption += '<option value="{{ $data['KodeProduksi'] }}">{{ $data['KodeProduksi'] . ' : ' . $data['InStock'] }}</option>';
+                                @break
+                            @endif
+                        @endforeach
+                    @endif 
+                @endforeach
+                var newRow = '<tr><td><select name="data1[' + i + '][KodeBaglog]" class="form-select" id="KodeBaglog">' + newOption + '</select></td><td><input type="number" name="data1[' + i + '][Jumlah]" class="form-control" /></td><td><button type="button" class="btn btn-outline-danger remove-input-field">Hapus</button></td></tr>';
+                $("#dynamicAddRemove").append(newRow);
+                i++;
+            });
+            $(document).on('click', '.remove-input-field', function(){
+                $(this).parents('tr').remove();
+            });
+        });
       </script>
       <script type="text/javascript">
-          var i = 0;
+           var i = {{ $BaglogOperator->isEmpty() ? 0 : count($BaglogOperator) }};
           $("#dynamic-ar2").click(function () {
               ++i;
               var newOption = '';
